@@ -93,5 +93,5 @@ if __name__ == "__main__":
     similarity_score_threshold = int(sys.argv[4])
 
     main(image_dir, results_dir, minimum_contour_area, similarity_score_threshold)
-    print('All the similar images are removed from {} and copied to {}'.format(sys.argv[1], sys.argv[2]))
+    print('Done!!! All the similar images are identified in directory- {} and unique images copied to {}'.format(sys.argv[1], sys.argv[2]))
 

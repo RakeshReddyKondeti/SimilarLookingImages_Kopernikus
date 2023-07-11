@@ -67,6 +67,7 @@ def visualize_threshold_image(image: np.ndarray)->None:
     """
     assert isinstance(image, np.ndarray)
     cv2.imshow('Threshold Image', image)
+    # cv2.imwrite('D:\\Kopernikus\\SimilarLookingImages\\test_data\\results\\ThresholdImage.png', image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -81,6 +82,7 @@ def visualize_contours(image: np.ndarray, cnts: list)->None:
     """
     assert isinstance(image, np.ndarray)
     cv2.drawContours(image, cnts, -1, (0, 255, 0), 3)
-    cv2.imshow('Visualizing Contours', image)
+    cv2.imshow('Visualizing Contours', image)    
+    # cv2.imwrite('D:\\Kopernikus\\SimilarLookingImages\\test_data\\results\\Contours.png', image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
