@@ -1,6 +1,10 @@
-# Find and remove all the similar and duplicate images
+# Duplicate or similar images detector 
 Identifies similar images in a given folder and copies all the unique images to the results folder.
 
+This code or repo does the following operations when executed successfully:
+1. **Detects** and quantifies the similarity between two image frames.
+2. **Removes** all the duplicate images by copying unique images to the results folder. 
+   
 Given a folder path containing multiple similar images (like images clicked with a CC camera in a parking lot at different intervals), this code copies all the unique frames to the results folder. However, it is important that all the images in the folder are readable. This code does not handle such cases and hence all the non-readable or corrupted image frames are safely ignored with the _try-except_ block. 
 
 This repository was written and tested on _python 3.9.4_ and _windows 10_. This repo assumes that _openCV_ library is already installed on your machine.
