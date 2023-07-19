@@ -30,48 +30,35 @@ def main(in_dir, results_dir, min_cntr_area, sim_thres):
     # just a simple sanity check
     assert len(cameras) == len(cameras_and_names)
 
-    # To visualize threshold images and contours. Do not change it to 'True' if you care about your time and computer.
-    visualize_thresh = False
-
-    # outer loop to iterate over cameras and their corresponding images
     for cam, files in tqdm(cameras_and_names.items(), desc= 'Camera index', ncols=100):
-        frame_score = {}    # a dict to contain scores
-        # inner loop to iterate through all the corresponding images for every camera
-        for idx, next_frame_name in enumerate(tqdm(files, desc= 'Image frame', ncols= 100, position=1, leave=False)):
-            try:
-                # a simple (non-essential) sanity check
-                if not cam in PureWindowsPath(next_frame_name).name:
+        prev_frames= []
+        try:
+            for frame_ix, fixed_frame_name in enumerate(tqdm(files, desc= 'Image frame', ncols= 100, position=1, leave=False)):
+                fixed_frame= cv2.imread(str(fixed_frame_name))
+                fixed_frame= preprocess_image_change_detection(fixed_frame, gaussian_blur_radius_list=[5])
+                fixed_frame= resize(fixed_frame) 
+
+                if frame_ix == 0:
+                    shutil.copy(str(fixed_frame_name), str(results_dir))
+                    prev_frames.append(fixed_frame.copy())
                     continue
                 
-                next_frame= cv2.imread(str(next_frame_name))
-                next_frame= preprocess_image_change_detection(next_frame, gaussian_blur_radius_list=[5])
-                next_frame= resize(next_frame)     # resizing all the frames here
-
-                if idx == 0:
-                    shutil.copy(str(next_frame_name), str(results_dir))   # copy first image of every camera to the results folder
-                    prev_frame_name = next_frame_name                     # after first image of the camera is copied to results, the first image becomes prev_frame 
-                    prev_frame= next_frame.copy()
-                    continue
+                scores_this_frame = []
                 
+                for _, prev_frame in enumerate(tqdm(prev_frames, desc= 'Prev frames', ncols= 100, position=2, leave=False)):
 
-                score, res_cnts, thresh = compare_frames_change_detection(prev_frame, next_frame, min_cntr_area)
-                
-                # visualizing threshold image and contours 
-                if visualize_thresh:
-                    visualize_threshold_image(thresh)  
-                    visualize_contours(next_frame.copy(), res_cnts)
+                    score, _, _ = compare_frames_change_detection(prev_frame, fixed_frame, min_cntr_area)
+                    scores_this_frame.append(score)
 
-                # next frame is the prev_frame for next iteration
-                prev_frame_name = next_frame_name
-                prev_frame = next_frame.copy()
+                prev_frames.append(fixed_frame.copy())
 
-                frame_score.update({prev_frame_name: score})
+                to_copy_images = [float(sc)>float(sim_thres) for sc in scores_this_frame]
 
-            except:
-                pass
-        
-        # copy all the non-duplicate or dissimilar images to results folder
-        remove_images(frame_score, sim_thres, results_dir)
+                if all(to_copy_images):
+                    shutil.copy(str(fixed_frame_name), str(results_dir))
+            
+        except:
+            pass        
 
 
 if __name__ == "__main__":
